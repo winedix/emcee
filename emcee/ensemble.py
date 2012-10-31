@@ -347,7 +347,8 @@ class EnsembleSampler(Sampler):
             M = map
 
         # Run the log-probability calculations (optionally in parallel).
-        results = list(M(self.lnprobfn, [p[i] for i in range(len(p))]))
+        results = list(M(self.lnprobfn, [[i] + list(p[i])
+                                                    for i in range(len(p))]))
 
         try:
             lnprob = np.array([l[0] for l in results])
@@ -434,7 +435,7 @@ class _function_wrapper(object):
 
     def __call__(self, x):
         try:
-            return self.f(x, *self.args)
+            return self.f(x[0], np.array(x[1:]), *self.args)
         except:
             import traceback
             print("emcee: Exception while calling your likelihood function:")
